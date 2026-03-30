@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BBYL Readiness Check | Pinhook Co.</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#1A2E4A;--navy-deep:#0F1E30;--gold:#C9993F;--gold-light:#E8C97A;--white:#FFFFFF;--muted:#6B7A8D;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--navy-deep);color:var(--white);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 50% at 20% 20%,rgba(201,153,63,0.08) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 80% 80%,rgba(26,46,74,0.6) 0%,transparent 60%);pointer-events:none;z-index:0;}
+.container{max-width:680px;margin:0 auto;padding:0 24px;position:relative;z-index:1;}
+.header{padding:40px 0 0;text-align:center;}
+.brand{font-size:11px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:32px;display:block;}
+.gold-bar{width:40px;height:2px;background:var(--gold);margin:0 auto 28px;}
+.screen{display:none;}.screen.active{display:block;}
+
+.intro-headline{font-family:'Cormorant Garamond',serif;font-size:clamp(38px,7vw,58px);font-weight:600;line-height:1.1;color:var(--white);margin-bottom:8px;}
+.intro-headline em{font-style:italic;color:var(--gold);}
+.intro-sub{font-size:15px;font-weight:300;color:rgba(255,255,255,0.65);line-height:1.7;margin:20px 0 36px;}
+.intro-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:40px;}
+.stat-card{background:rgba(255,255,255,0.05);border:1px solid rgba(201,153,63,0.2);border-radius:12px;padding:18px 12px;text-align:center;}
+.stat-num{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;color:var(--gold);display:block;line-height:1;margin-bottom:6px;}
+.stat-label{font-size:11px;color:rgba(255,255,255,0.5);line-height:1.3;}
+
+.btn-primary{display:block;width:100%;background:var(--gold);color:var(--navy-deep);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;letter-spacing:0.04em;padding:18px 32px;border:none;border-radius:8px;cursor:pointer;transition:all 0.2s ease;text-align:center;margin-bottom:16px;}
+.btn-primary:hover{background:var(--gold-light);transform:translateY(-1px);}
+.intro-note{text-align:center;font-size:12px;color:rgba(255,255,255,0.3);margin-top:20px;padding-bottom:40px;}
+
+.progress-wrap{padding:32px 0 24px;}
+.progress-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.progress-label{font-size:12px;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;font-weight:500;}
+.progress-count{font-size:12px;color:rgba(255,255,255,0.4);}
+.progress-bar{height:3px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:2px;transition:width 0.4s ease;}
+
+.question-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:32px;margin-bottom:20px;animation:fadeUp 0.35s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+.q-category{font-size:10px;font-weight:500;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);margin-bottom:14px;}
+.q-text{font-family:'Cormorant Garamond',serif;font-size:clamp(20px,4vw,26px);font-weight:400;line-height:1.35;color:var(--white);margin-bottom:28px;}
+.options{display:flex;flex-direction:column;gap:10px;}
+.option{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:15px 18px;cursor:pointer;transition:all 0.2s ease;display:flex;align-items:center;gap:14px;text-align:left;}
+.option:hover{background:rgba(201,153,63,0.08);border-color:rgba(201,153,63,0.4);}
+.option.selected{background:rgba(201,153,63,0.12);border-color:var(--gold);}
+.option-indicator{width:22px;height:22px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.25);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.2s;}
+.option.selected .option-indicator{background:var(--gold);border-color:var(--gold);}
+.option.selected .option-indicator::after{content:'';width:8px;height:8px;background:var(--navy-deep);border-radius:50%;display:block;}
+.option-text{font-size:14px;line-height:1.4;color:rgba(255,255,255,0.8);font-weight:300;}
+.option.selected .option-text{color:var(--white);}
+
+.nav-row{display:flex;gap:12px;padding-bottom:48px;}
+.btn-back{background:transparent;color:rgba(255,255,255,0.4);font-family:'DM Sans',sans-serif;font-size:14px;padding:16px 24px;border:1px solid rgba(255,255,255,0.1);border-radius:8px;cursor:pointer;transition:all 0.2s;flex-shrink:0;}
+.btn-back:hover{border-color:rgba(255,255,255,0.25);color:rgba(255,255,255,0.7);}
+.btn-next{flex:1;background:var(--gold);color:var(--navy-deep);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;padding:16px 24px;border:none;border-radius:8px;cursor:pointer;transition:all 0.2s;opacity:0.4;pointer-events:none;}
+.btn-next.enabled{opacity:1;pointer-events:all;}
+.btn-next.enabled:hover{background:var(--gold-light);transform:translateY(-1px);}
+
+.email-screen-inner{padding:40px 0 48px;text-align:center;}
+.email-icon{width:60px;height:60px;background:rgba(201,153,63,0.12);border:1px solid rgba(201,153,63,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;}
+.email-icon svg{width:24px;height:24px;stroke:var(--gold);fill:none;stroke-width:1.5;}
+.email-headline{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,5vw,40px);font-weight:600;color:var(--white);line-height:1.2;margin-bottom:12px;}
+.email-sub{font-size:14px;color:rgba(255,255,255,0.5);font-weight:300;margin-bottom:32px;line-height:1.6;}
+.form-group{margin-bottom:14px;text-align:left;}
+.form-group label{display:block;font-size:11px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:8px;}
+.form-group input{width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:14px 16px;font-family:'DM Sans',sans-serif;font-size:15px;color:var(--white);transition:border-color 0.2s;outline:none;}
+.form-group input::placeholder{color:rgba(255,255,255,0.25);}
+.form-group input:focus{border-color:var(--gold);}
+.privacy-note{font-size:11px;color:rgba(255,255,255,0.25);margin-top:12px;line-height:1.5;}
+
+.results-header{padding:40px 0 0;text-align:center;}
+.result-badge{display:inline-block;font-size:10px;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;padding:6px 16px;border-radius:20px;margin-bottom:20px;}
+.badge-ready{background:rgba(100,180,100,0.15);color:#7EC87E;border:1px solid rgba(100,180,100,0.3);}
+.badge-almost{background:rgba(201,153,63,0.15);color:var(--gold-light);border:1px solid rgba(201,153,63,0.3);}
+.badge-building{background:rgba(100,140,200,0.15);color:#8AB4E8;border:1px solid rgba(100,140,200,0.3);}
+.badge-urgent{background:rgba(220,100,80,0.15);color:#F0957E;border:1px solid rgba(220,100,80,0.3);}
+.score-circle{width:80px;height:80px;border-radius:50%;border:2px solid var(--gold);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 20px;background:rgba(201,153,63,0.06);}
+.score-num{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;color:var(--gold);line-height:1;}
+.score-denom{font-size:10px;color:rgba(255,255,255,0.4);letter-spacing:0.05em;}
+.result-title{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,5vw,44px);font-weight:600;line-height:1.2;color:var(--white);margin-bottom:16px;}
+.result-title em{font-style:italic;color:var(--gold);}
+.result-desc{font-size:15px;font-weight:300;color:rgba(255,255,255,0.65);line-height:1.7;margin-bottom:32px;}
+.insights{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:24px;margin-bottom:28px;text-align:left;}
+.insights-title{font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:16px;}
+.insight-item{display:flex;gap:12px;margin-bottom:14px;align-items:flex-start;}
+.insight-item:last-child{margin-bottom:0;}
+.insight-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);margin-top:7px;flex-shrink:0;}
+.insight-text{font-size:14px;color:rgba(255,255,255,0.7);line-height:1.5;font-weight:300;}
+.cta-box{background:linear-gradient(135deg,rgba(201,153,63,0.12),rgba(201,153,63,0.04));border:1px solid rgba(201,153,63,0.3);border-radius:16px;padding:28px 24px;margin-bottom:20px;text-align:center;}
+.cta-box-label{font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.cta-box-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--white);margin-bottom:8px;line-height:1.3;}
+.cta-box-desc{font-size:13px;color:rgba(255,255,255,0.5);font-weight:300;margin-bottom:20px;line-height:1.6;}
+.cta-price{font-family:'Cormorant Garamond',serif;font-size:16px;color:rgba(255,255,255,0.4);margin-bottom:16px;display:block;}
+.btn-cta{display:block;width:100%;background:var(--gold);color:var(--navy-deep);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;padding:17px;border:none;border-radius:8px;cursor:pointer;text-decoration:none;transition:all 0.2s;letter-spacing:0.02em;}
+.btn-cta:hover{background:var(--gold-light);transform:translateY(-1px);}
+.share-row{text-align:center;padding:12px 0 32px;}
+.share-label{font-size:12px;color:rgba(255,255,255,0.3);margin-bottom:12px;}
+.share-btn{background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);font-family:'DM Sans',sans-serif;font-size:13px;padding:10px 24px;border-radius:6px;cursor:pointer;transition:all 0.2s;}
+.share-btn:hover{border-color:rgba(255,255,255,0.3);color:rgba(255,255,255,0.8);}
+.footer-brand{text-align:center;padding:0 0 40px;font-size:11px;color:rgba(255,255,255,0.2);letter-spacing:0.08em;}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <span class="brand">Pinhook Co. · Build Before You Leap™</span>
+    <div class="gold-bar"></div>
+  </div>
+
+  <!-- INTRO -->
+  <div class="screen active" id="screen-intro">
+    <h1 class="intro-headline">Are You Ready<br>to <em>Leap?</em></h1>
+    <p class="intro-sub">Take the BBYL Readiness Check — 9 honest questions that reveal exactly where you are in your transition and what your smartest next move is. Whether you're planning to leave, feeling the pull, on the brink of uncertainty, or were recently let go — this was built for you.</p>
+    <div class="intro-stats">
+      <div class="stat-card"><span class="stat-num">9</span><span class="stat-label">Questions</span></div>
+      <div class="stat-card"><span class="stat-num">3</span><span class="stat-label">Minutes</span></div>
+      <div class="stat-card"><span class="stat-num">Free</span><span class="stat-label">Always</span></div>
+    </div>
+    <button class="btn-primary" onclick="startQuiz()">Take the Readiness Check →</button>
+    <div class="intro-note">Your personalized results + action plan delivered to your inbox.</div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="screen" id="screen-quiz">
+    <div class="progress-wrap">
+      <div class="progress-meta">
+        <span class="progress-label" id="q-category"></span>
+        <span class="progress-count" id="q-count"></span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    </div>
+    <div class="question-card" id="question-card">
+      <div class="q-category" id="q-cat-display"></div>
+      <div class="q-text" id="q-text"></div>
+      <div class="options" id="q-options"></div>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" id="btn-back" onclick="prevQuestion()">← Back</button>
+      <button class="btn-next" id="btn-next" onclick="nextQuestion()">Continue →</button>
+    </div>
+  </div>
+
+  <!-- EMAIL -->
+  <div class="screen" id="screen-email">
+    <div class="email-screen-inner">
+      <div class="email-icon">
+        <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 7 10-7"/></svg>
+      </div>
+      <h2 class="email-headline">Your results<br>are ready.</h2>
+      <p class="email-sub">Enter your name and email to unlock your personalized Leap Readiness Score and your exact next step.</p>
+      <div class="form-group"><label>First Name</label><input type="text" id="input-name" placeholder="Your first name"/></div>
+      <div class="form-group"><label>Email Address</label><input type="email" id="input-email" placeholder="your@email.com"/></div>
+      <button class="btn-primary" onclick="showResults()" style="margin-top:20px;">Show My Results →</button>
+      <p class="privacy-note">No spam. Ever. Unsubscribe anytime. Your results will be emailed to you.</p>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="screen" id="screen-results">
+    <div class="results-header">
+      <div class="result-badge" id="result-badge"></div>
+      <div class="score-circle">
+        <span class="score-num" id="result-score">0</span>
+        <span class="score-denom">/ 27</span>
+      </div>
+      <h2 class="result-title" id="result-title"></h2>
+      <p class="result-desc" id="result-desc"></p>
+    </div>
+    <div class="insights">
+      <div class="insights-title">What your answers revealed</div>
+      <div id="result-insights"></div>
+    </div>
+    <div class="cta-box" id="result-cta"></div>
+    <div class="share-row">
+      <p class="share-label">Know someone who needs this?</p>
+      <button class="share-btn" onclick="shareQuiz()">Share this quiz</button>
+    </div>
+    <div class="footer-brand">pinhookco.com · @theandreaclark</div>
+  </div>
+</div>
+
+<script>
+const questions = [
+  {
+    category: "Your Situation",
+    text: "Which best describes where you are right now?",
+    options: [
+      { text: "I'm actively planning to leave — this is my choice and my timeline", score: 3 },
+      { text: "I feel the pull to leave but haven't made any real moves yet", score: 2 },
+      { text: "My job feels unstable — layoffs, restructuring, or uncertainty have me on edge", score: 2, flag: "uncertain" },
+      { text: "I was recently let go and this transition just became urgent", score: 1, flag: "involuntary" }
+    ]
+  },
+  {
+    category: "Mindset",
+    text: "When you imagine running your own business, what does your inner voice say most?",
+    options: [
+      { text: "I'm ready — I know my value and I'm building toward something real", score: 3 },
+      { text: "I think I could do it, but I worry I'm not experienced or credentialed enough", score: 1 },
+      { text: "I keep waiting until conditions are perfect before I start", score: 0 },
+      { text: "What if I put myself out there and nobody takes me seriously?", score: 1 }
+    ]
+  },
+  {
+    category: "Mindset",
+    text: "Your job title is about to disappear from your bio. How does that feel?",
+    options: [
+      { text: "Freeing — my value was never in the title anyway", score: 3 },
+      { text: "Unsettling — more of my identity is tied to it than I'd like to admit", score: 1 },
+      { text: "Terrifying — it's proof I'm qualified. Without it, who am I?", score: 0 },
+      { text: "Fine — I'm already building my own brand and identity to replace it", score: 3 }
+    ]
+  },
+  {
+    category: "Clarity",
+    text: "Can you describe your business idea in one clear sentence right now?",
+    options: [
+      { text: "Yes — I know exactly who I help, what I do, and what outcome I deliver", score: 3 },
+      { text: "Mostly — I have a strong direction but the details are still forming", score: 2 },
+      { text: "I have a few ideas but haven't committed to or defined one yet", score: 1 },
+      { text: "No — I want to leave but I honestly don't know what I'd build", score: 0 }
+    ]
+  },
+  {
+    category: "Finances",
+    text: "Do you know your survival number — the minimum your business must earn monthly before you transition?",
+    options: [
+      { text: "Yes — I've calculated it and I know exactly what I need to hit", score: 3 },
+      { text: "I have a rough idea but haven't done the real math yet", score: 2 },
+      { text: "Not really — I've been avoiding looking at the numbers honestly", score: 1 },
+      { text: "No — the financial side feels completely overwhelming right now", score: 0 }
+    ]
+  },
+  {
+    category: "Finances",
+    text: "How many months of personal expenses do you currently have saved as a financial runway?",
+    options: [
+      { text: "6 or more months — I'm financially prepared to make this move", score: 3 },
+      { text: "3–5 months — I have a cushion but I'm still building it", score: 2 },
+      { text: "1–2 months — I know this needs to be addressed before I leap", score: 1 },
+      { text: "Less than 1 month — the financial pressure is real and immediate", score: 0 }
+    ]
+  },
+  {
+    category: "Action",
+    text: "How long have you been thinking seriously about making this transition?",
+    helper: ""Seriously" means more than a passing thought — it means you've researched it, talked about it, or taken at least one step toward it.",
+    options: [
+      { text: "I'm already building — I've taken real concrete steps in the last 90 days", score: 3 },
+      { text: "Less than 6 months — this is newer but I'm taking it seriously", score: 2 },
+      { text: "6–12 months — I think about it constantly but haven't started yet", score: 1 },
+      { text: "Over a year — something always seems to get in the way of actually starting", score: 0 }
+    ]
+  },
+  {
+    category: "Action",
+    text: "When it comes to actually starting, which feels most true?",
+    options: [
+      { text: "I've started — I have something defined and I'm working on it consistently", score: 3 },
+      { text: "I'm waiting until I have more clarity, more savings, or more time", score: 1 },
+      { text: "I'm waiting for the perfect moment to feel right — it never quite comes", score: 0 },
+      { text: "Circumstances are forcing my hand — I'm starting out of necessity, not readiness", score: 2, flag: "involuntary" }
+    ]
+  },
+  {
+    category: "Foundation",
+    text: "If everything aligned today and you had 90 days to make this transition — what would honestly hold you back?",
+    options: [
+      { text: "Nothing. I have a plan and I'm ready to execute it", score: 3 },
+      { text: "The money — I need more runway and a real financial plan before I'd feel safe", score: 1 },
+      { text: "Clarity — I need a defined offer and a real strategy first", score: 1 },
+      { text: "Fear — even with everything in place, I'd still find a reason to wait", score: 0 }
+    ]
+  }
+];
+
+let current = 0;
+let answers = [];
+let flags = [];
+let userName = '';
+
+function startQuiz() {
+  showScreen('screen-quiz');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = questions[current];
+  document.getElementById('q-category').textContent = q.category;
+  document.getElementById('q-cat-display').textContent = q.category;
+  document.getElementById('q-count').textContent = (current + 1) + ' of ' + questions.length;
+  document.getElementById('progress-fill').style.width = (((current + 1) / questions.length) * 100) + '%';
+
+  document.getElementById('q-text').textContent = q.text;
+  const optContainer = document.getElementById('q-options');
+  optContainer.innerHTML = '';
+  q.options.forEach(function(opt, i) {
+    const div = document.createElement('div');
+    div.className = 'option' + (answers[current] === i ? ' selected' : '');
+    div.innerHTML = '<div class="option-indicator"></div><span class="option-text">' + opt.text + '</span>';
+    div.onclick = function() { selectOption(i); };
+    optContainer.appendChild(div);
+  });
+
+  const nextBtn = document.getElementById('btn-next');
+  const backBtn = document.getElementById('btn-back');
+  nextBtn.classList.toggle('enabled', answers[current] !== undefined);
+  nextBtn.textContent = current === questions.length - 1 ? 'See My Results →' : 'Continue →';
+  backBtn.style.display = current === 0 ? 'none' : 'block';
+
+  const card = document.getElementById('question-card');
+  card.style.animation = 'none';
+  setTimeout(function() { card.style.animation = 'fadeUp 0.35s ease'; }, 10);
+}
+
+function selectOption(i) {
+  const opt = questions[current].options[i];
+  if (opt.flag && !flags.includes(opt.flag)) flags.push(opt.flag);
+  answers[current] = i;
+  document.querySelectorAll('.option').forEach(function(el, idx) {
+    el.classList.toggle('selected', idx === i);
+  });
+  document.getElementById('btn-next').classList.add('enabled');
+}
+
+function nextQuestion() {
+  if (answers[current] === undefined) return;
+  if (current < questions.length - 1) { current++; renderQuestion(); }
+  else { showScreen('screen-email'); }
+}
+
+function prevQuestion() {
+  if (current > 0) { current--; renderQuestion(); }
+}
+
+function showResults() {
+  const name = document.getElementById('input-name').value.trim();
+  const email = document.getElementById('input-email').value.trim();
+  if (!name || !email) { alert('Please enter your name and email to see your results.'); return; }
+  userName = name;
+
+  const total = answers.reduce(function(sum, ansIdx, qIdx) {
+    return sum + (questions[qIdx].options[ansIdx] ? questions[qIdx].options[ansIdx].score : 0);
+  }, 0);
+
+  const isInvoluntary = flags.includes('involuntary');
+  const isUncertain = flags.includes('uncertain');
+
+  document.getElementById('result-score').textContent = total;
+
+  let badge, title, desc, insights, ctaLabel, ctaDesc;
+
+  if (isInvoluntary) {
+    badge = { text: 'Urgent — Act Now', cls: 'badge-urgent' };
+    title = 'The decision was made<br><em>for you, ' + name + '. Now make it yours.</em>';
+    desc = 'Being let go is jarring — but it\'s also a door. The women who come out stronger are the ones who stop waiting and start building with intention instead of panic. You don\'t need to have everything figured out. You need a plan — fast, clear, and strategic.';
+    insights = [
+      'You\'re in a transition whether you chose it or not — the question is how strategically you navigate it',
+      'Financial urgency is real right now, but reacting without a plan makes it worse, not better',
+      'Your corporate experience is a valuable asset — it didn\'t disappear when the job did',
+      'The BBYL framework was built for exactly this moment — clarity before chaos'
+    ];
+    ctaLabel = 'Your most important next move';
+    ctaDesc = 'You don\'t have the luxury of waiting for the perfect moment. This workbook gives you a strategic framework to define your offer, map your finances, and build a real plan — before the pressure forces the wrong leap.';
+  } else if (isUncertain) {
+    badge = { text: 'Build Before It\'s Too Late', cls: 'badge-urgent' };
+    title = 'The window is open,<br><em>' + name + '. Use it now.</em>';
+    desc = 'You can feel the instability coming — and that awareness is a gift. Most people ignore it until the decision is made for them. You still have your income, your stability, and your time. That\'s your runway. The question is whether you\'ll build something before the ground shifts.';
+    insights = [
+      'Job uncertainty is one of the strongest signals to start building — not one to wait out',
+      'Building while you\'re still employed is infinitely easier than building under financial pressure',
+      'Your clarity and financial planning need to happen now — not after the worst case scenario arrives',
+      'The women who land well are always the ones who prepared before the leap was forced on them'
+    ];
+    ctaLabel = 'Your most strategic next move';
+    ctaDesc = 'You have a window right now. This workbook helps you use it — with a defined offer, a financial plan, and a 90-day build strategy you can execute while you still have the stability to do it right.';
+  } else if (total >= 20) {
+    badge = { text: 'Leap Ready', cls: 'badge-ready' };
+    title = 'The foundation is there,<br><em>' + name + '. Time to commit.</em>';
+    desc = 'Your score shows you\'ve done the inner work — the clarity, the mindset, the financial awareness. You have more in place than most women who make this transition. What you need now isn\'t more preparation. It\'s a plan that formalizes what you\'ve built and locks in your timeline.';
+    insights = [
+      'Your motivation is vision-driven — you\'re building toward something real, not just running from something',
+      'You\'ve begun separating your self-worth from your job title — that mindset shift is rare and powerful',
+      'You have financial awareness and runway in place — now build the strategy around it',
+      'Your biggest move right now is committing to a transition date and working backward from it'
+    ];
+    ctaLabel = 'Your next step';
+    ctaDesc = 'Six sections. Real exercises. A financial plan. The complete framework to map your transition — strategically and on your own terms.';
+  } else if (total >= 12) {
+    badge = { text: 'Almost There', cls: 'badge-almost' };
+    title = 'You\'re closer than<br><em>you think, ' + name + '.</em>';
+    desc = 'You have the desire and some of the pieces — but there are gaps that, left unfilled, will make this harder than it needs to be. The good news? Every gap you have is exactly what the BBYL Workbook addresses — section by section, exercise by exercise.';
+    insights = [
+      'Your vision is forming but needs specificity — vague goals don\'t survive hard days',
+      'The "waiting for the perfect moment" pattern is costing you more time than you realize',
+      'Your financial picture needs honest attention before you make any moves',
+      'Building before you leap gives you the runway to do this without financial panic'
+    ];
+    ctaLabel = 'Your next step';
+    ctaDesc = 'This workbook was built specifically for where you are right now — clear enough to want it, not yet fully equipped with the strategy to do it safely.';
+  } else {
+    badge = { text: 'Start Here', cls: 'badge-building' };
+    title = 'The pull is real,<br><em>' + name + '. Start here.</em>';
+    desc = 'You\'re in the early stage — the desire is there but the path isn\'t clear yet. That\'s not a problem. Every successful transition started exactly here. What you need isn\'t more motivation. You need a framework that turns the feeling into a plan you can actually execute.';
+    insights = [
+      'The desire to build something of your own is worth taking seriously — even before you feel ready',
+      'Waiting for clarity before you start is backwards — clarity comes from doing the work, not waiting',
+      'The financial side needs honest attention — fear shrinks when you face the real numbers',
+      'The longer you wait without a plan, the harder the decision becomes — there is no perfect time'
+    ];
+    ctaLabel = 'Where to begin';
+    ctaDesc = 'You don\'t need to have it all figured out. You need a framework that figures it out with you — section by section, exercise by exercise, at your own pace.';
+  }
+
+  const badgeEl = document.getElementById('result-badge');
+  badgeEl.textContent = badge.text;
+  badgeEl.className = 'result-badge ' + badge.cls;
+  document.getElementById('result-title').innerHTML = title;
+  document.getElementById('result-desc').textContent = desc;
+  document.getElementById('result-insights').innerHTML = insights.map(function(i) {
+    return '<div class="insight-item"><div class="insight-dot"></div><span class="insight-text">' + i + '</span></div>';
+  }).join('');
+  document.getElementById('result-cta').innerHTML =
+    '<div class="cta-box-label">' + ctaLabel + '</div>' +
+    '<div class="cta-box-title">Build Before You Leap\u2122 Workbook</div>' +
+    '<div class="cta-box-desc">' + ctaDesc + '</div>' +
+    '<span class="cta-price">One-time \u00b7 $97</span>' +
+    '<a class="btn-cta" href="https://stan.store/andreaclark" target="_blank">Get the Workbook \u2014 $97 \u2192</a>';
+
+  showScreen('screen-results');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function shareQuiz() {
+  const text = 'Are you ready to leap? Take the BBYL Readiness Check and find out exactly where you are in your transition — and what to do next.';
+  if (navigator.share) {
+    navigator.share({ title: 'BBYL Readiness Check', text: text, url: window.location.href });
+  } else {
+    navigator.clipboard.writeText(window.location.href).then(function() { alert('Link copied to clipboard!'); });
+  }
+}
+</script>
+</body>
+</html>
